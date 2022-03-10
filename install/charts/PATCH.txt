@@ -1,0 +1,7 @@
+This is a patched version of the original karydia helm chart:
+- refactor ssl and webhook configuration logic: remove cumbersome hook, use sprig crypto functions instead; requires helm's lookup function (helm >= 3.2)
+- remove custom-seccomp logic; according folder was anyway empty; in addition the daemonset's labels were not unique enough (clashes with the main deployment's selector)
+- use kubernetes.io/metadata.name label to exclude kube-system reliably (available from k8s 1.21, resp. earlier as alpha feature gate)
+- remove delete hook (not needed anymore)
+
+See: https://github.com/sap-contributions/karydia/tree/cs-devops 
