@@ -46,3 +46,5 @@ spec:
                 type: string
               networkPolicies:
                 type: string
+              podSecurityContext:
+                type: string
