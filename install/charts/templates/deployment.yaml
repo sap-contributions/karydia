@@ -34,7 +34,7 @@ spec:
       serviceAccount: {{ .Values.rbac.serviceAccount }}
       affinity:
         {{- if .Values.setup.affinity }}
-{{ toYaml .Values.setup.affinity | indent 8 }} 
+        {{- toYaml .Values.setup.affinity | nindent 8 }}
         {{- else }}
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -48,12 +48,29 @@ spec:
                   - {{ .Values.metadata.labelApp }}
               topologyKey: "node"
         {{- end }}
+      topologySpreadConstraints:
+      {{- if .Values.setup.topologySpreadConstraints }}
+      {{- toYaml .Values.setup.topologySpreadConstraints | trim | nindent 8 }}
+      {{- else }}
+      - maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: {{ .Values.setup.defaultHostNameSpreadPolicy  }}
+        labelSelector:
+          matchLabels:
+            app: {{ .Values.metadata.labelApp }}
+      - maxSkew: 1
+        topologyKey: topology.kubernetes.io/zone
+        whenUnsatisfiable: {{ .Values.setup.defaultZoneSpreadPolicy  }}
+        labelSelector:
+          matchLabels:
+            app: {{ .Values.metadata.labelApp }}
+      {{- end }}
       {{- if .Values.setup.priorityClassName }}
       priorityClassName: {{ .Values.setup.priorityClassName }}
       {{- end }}
       {{- if .Values.setup.tolerations }}
       tolerations:
-{{ toYaml .Values.setup.tolerations | indent 6 }}
+      {{- toYaml .Values.setup.tolerations | nindent 6 }}
       {{- end }}
       containers:
       - name: {{ .Values.metadata.name }}
@@ -63,7 +80,7 @@ spec:
         {{- else }}
         image: eu.gcr.io/gardener-project/karydia/karydia
         imagePullPolicy: Always
-        {{- end }} 
+        {{- end }}
         command:
           {{- if .Values.dev.active }}
           - hotswap-dev
